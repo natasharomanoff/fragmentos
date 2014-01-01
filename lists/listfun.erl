@@ -3,7 +3,12 @@
 	     tail/1,
 	     sum/1,
 	     sum1/1,
-	     product/1]).
+	     product/1,
+	     all/2, 
+	     any/2,
+	     filter/2,
+	     map/2,
+	     last/1]).
 
 head([]) -> error("head of empty list");
 head([H|_]) -> H.
@@ -30,34 +35,31 @@ product(L) -> product(L, 1).
 product([H|T], Acc) -> product(T, Acc * H);
 product([], Acc) -> Acc.
 
-%% All
-%% returns true if predicate returns true for all 
-%% elements in the given List, otherwise false.
+%% Tail recursion with boolean Accumulators
+
+all(Pred, L) -> all(Pred, L, true).
+
+all(Pred, [H|T], Acc) -> all(Pred, T, Pred(H) and Acc);
+all(_, [], Acc) -> Acc.  
+
+%% %%%%
+
+any(Pred, L) -> any(Pred, L, false).
+
+any(Pred, [H|T], Acc) -> any(Pred, T, Pred(H) or Acc);
+any(_, [], Acc) -> Acc.  
 
 
-%% Any
-%% returns true if predicate returns true for at 
-%% least one element in the given List.
+%% filter and map using list comprehension
 
-%% dropwhile
-%% Drops elements from given List while predicate returns true 
-%% and returns the remaining list.
+filter(Pred, L) -> [X || X <- L, Pred(X)].
 
-%% filter
-%% returns a list of all elements in the given List for which 
-%% predicate returns true.
+map(F, L) -> [F(X) || X <- L].
 
-%% map
-%% Takes a function from As to Bs, and a list of As and produces 
-%% a list of Bs by applying the function to every element in the list. 
-%% This function is used to obtain the return values. 
-%% The evaluation order is implementation dependent.
+%% nice trick with pattern match and recursion.
 
-%% partition
-%% Partitions the given List into two lists, where the first list 
-%% contains all elements for which the given predicate returns true, 
-%% and the second list contains all elements for which the predicate 
-%% returns false.
+last([H|T]) -> last(H, T).
 
-%% reverse
-%% returns a list with the elements in the given list in reverse order.
+last(_, [H|T]) -> last(H, T);
+last(L, []) -> L.
+
